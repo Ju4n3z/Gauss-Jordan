@@ -55,7 +55,7 @@ const crearMatriz = (tamaño) =>{
 
         for (let i = 0; i < matrizInversa.length; i++) {
           for (let j = 0; j < matrizInversa[i].length; j++) {
-            if (matrizInversa[i][j] === Infinity || matrizInversa[i][j] === NaN || matrizInversa[i][j] === -Infinity || matrizInversa[i][j] === undefined || matrizInversa[i][j] === null) {
+            if (matrizInversa[i][j] === Infinity || matrizInversa[i][j] === NaN || matrizInversa[i][j] === -Infinity || matrizInversa[i][j] === undefined || matrizInversa[i][j] === null || matrizInversa[i][j].toFixed(2).toString().length > 13) {
               noTiene = "No tiene inversa";
               break;
             }
