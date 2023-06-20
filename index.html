@@ -1,22 +1,137 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="./js/main.js" defer></script>
-    <title>Document</title>
+  <title>Gauss-Jordan</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
 </head>
 <body>
+  <br>
+  <form id="formulario" class="container text-center">
+    <input type="number" name="tamaño" placeholder="tamaño de la matriz" min="2">
+    <input type="submit" value="enviar" class="btn btn-outline-success">
+  </form>
+  <br>
+  <form id="matriz" class="container text-center">
 
-    <form id="formulario">
-        <input type="number" name="tamaño" placeholder="ingrese el tamaño de la matriz nxn" min="2">
-        <input type="submit">
-    </form>
+  </form>
 
-    <form id="matriz">
+  <script>
 
-    </form>
-    
+let matrizInversa = [];
+
+const crearMatriz = (tamaño) =>{
+    let matriz = document.querySelector('#matriz');
+    matriz.innerHTML = '';
+    for (let i = 0; i < tamaño; i++) {
+        for (let j = 0; j < tamaño; j++) {
+            tabla = `<input type="text" style="width: 100px;" id="${[i].toString()+[j].toString()}"  placeholder="número">`;
+            matriz.insertAdjacentHTML('beforeend', tabla);
+        }
+        let br = document.createElement('br');
+        matriz.appendChild(br);
+    }
+    let boton = `<input type="submit" value="calcular" class="btn btn-outline-success">`;
+    let br = document.createElement('br');
+    matriz.appendChild(br);
+    matriz.insertAdjacentHTML('beforeend', boton);
+    let botonCalcular = document.querySelector('#matriz');
+    botonCalcular.addEventListener("submit", (e)=>{
+        e.preventDefault();
+        matrizN = [];
+        for (let i = 0; i < tamaño; i++) {
+            if(!matrizN[i]){
+                matrizN[i] = [];
+                };
+                for(let j = 0; j < tamaño; j++){
+                    let valor = parseFloat(document.getElementById(`${[i].toString()+[j].toString()}`).value);
+                    matrizN[i][j] = valor;
+                };
+        }
+        console.log(matrizN);
+        document.getElementById("matriz").innerHTML += "<br> Matriz inversa: <br> <br>";
+        matrizInversa = calcularMatrizInversa(matrizN);
+        console.log(matrizInversa);
+        let noTiene = "";
+
+        for (let i = 0; i < matrizInversa.length; i++) {
+          for (let j = 0; j < matrizInversa[i].length; j++) {
+            if (matrizInversa[i][j] === Infinity || matrizInversa[i][j] === NaN || matrizInversa[i][j] === -Infinity || matrizInversa[i][j] === undefined || matrizInversa[i][j] === null || matrizInversa[i][j].toString().length > 13) {
+              noTiene = "No tiene inversa";
+              break;
+            }
+          }
+        }
+        if (noTiene === "") {
+          for (let i = 0; i < matrizInversa.length; i++) {
+            for (let j = 0; j < matrizInversa[i].length; j++) {
+              document.getElementById("matriz").innerHTML += matrizInversa[i][j].toFixed(2) + "    ";
+            }
+            document.getElementById("matriz").innerHTML += "<br>";
+          }
+        } else {
+          document.getElementById("matriz").innerHTML += noTiene;
+        }
+        let recargar = `<br> <br> <button onclick="window.location.reload();" class="btn btn-outline-success">Recargar</button>`;
+        document.getElementById("matriz").innerHTML += recargar;
+    })
+}
+
+
+
+const calcularMatrizInversa = (matriz) => {
+  const n = matriz.length;
+  const matrizIdentidad = [];
+  for (let i = 0; i < n; i++) {
+    matrizIdentidad[i] = [];
+    for (let j = 0; j < n; j++) {
+      matrizIdentidad[i][j] = (i === j) ? 1 : 0;
+    }
+  }
+
+  // Concatenar matriz original con matriz identidad
+  const matrizAumentada = matriz.map((fila, indice) => fila.concat(matrizIdentidad[indice]));
+
+  for (let i = 0; i < n; i++) {
+    // Pivoteo parcial
+    let maxRow = i;
+    for (let j = i + 1; j < n; j++) {
+      if (Math.abs(matrizAumentada[j][i]) > Math.abs(matrizAumentada[maxRow][i])) {
+        maxRow = j;
+      }
+    }
+    [matrizAumentada[i], matrizAumentada[maxRow]] = [matrizAumentada[maxRow], matrizAumentada[i]];
+
+    // Hacer el pivote en la fila i
+    let pivot = matrizAumentada[i][i];
+    for (let j = i; j < 2 * n; j++) {
+      matrizAumentada[i][j] /= pivot;
+    }
+
+    // Eliminar otras entradas en la columna del pivote
+    for (let k = 0; k < n; k++) {
+      if (k !== i) {
+        let factor = matrizAumentada[k][i];
+        for (let j = i; j < 2 * n; j++) {
+          matrizAumentada[k][j] -= factor * matrizAumentada[i][j];
+        }
+      }
+    }
+  }
+
+  // Extraer la matriz inversa de la matriz aumentada
+  const matrizInversa = matrizAumentada.map((fila) => fila.slice(n));
+
+  return matrizInversa;
+};
+
+let formulario = document.querySelector('#formulario');
+
+formulario.addEventListener("submit", (e)=>{
+	e.preventDefault();
+	let data = Object.fromEntries(new FormData(e.target));
+	crearMatriz(data.tamaño);
+});
+
+  </script>
 </body>
 </html>
